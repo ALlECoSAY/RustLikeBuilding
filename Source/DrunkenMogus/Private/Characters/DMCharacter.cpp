@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Characters/DrunkenMogusCharacter.h"
+#include "Characters/DMCharacter.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -17,7 +17,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // ADrunkenMogusCharacter
 
-ADrunkenMogusCharacter::ADrunkenMogusCharacter()
+ADMCharacter::ADMCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -56,7 +56,7 @@ ADrunkenMogusCharacter::ADrunkenMogusCharacter()
 	
 }
 
-void ADrunkenMogusCharacter::BeginPlay()
+void ADMCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
@@ -84,7 +84,7 @@ void ADrunkenMogusCharacter::BeginPlay()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void ADrunkenMogusCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ADMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
@@ -94,10 +94,10 @@ void ADrunkenMogusCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADrunkenMogusCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADMCharacter::Move);
 
 		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADrunkenMogusCharacter::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADMCharacter::Look);
 	}
 	else
 	{
@@ -105,7 +105,7 @@ void ADrunkenMogusCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	}
 }
 
-void ADrunkenMogusCharacter::Move(const FInputActionValue& Value)
+void ADMCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -128,7 +128,7 @@ void ADrunkenMogusCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void ADrunkenMogusCharacter::Look(const FInputActionValue& Value)
+void ADMCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -139,4 +139,10 @@ void ADrunkenMogusCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+	UpdateLook(FollowCamera->GetComponentLocation(), FollowCamera->GetForwardVector());
+}
+
+void ADMCharacter::UpdateLook(FVector CameraLocation, FVector CameraForwardVector)
+{
+	OnUpdateLookDelegate.Execute(CameraLocation, CameraForwardVector);
 }

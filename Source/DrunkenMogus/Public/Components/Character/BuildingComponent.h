@@ -10,7 +10,9 @@
 class UInputMappingContext;
 class UInputAction;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(OnUpdateBlueprintTransformDelegate, FTransform);
+//HUD link to show/hide building menu
+DECLARE_DELEGATE_OneParam(FOnToggleBuildingMenuSignature,/*bIsShown*/ bool);
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, BlueprintType)
 class DRUNKENMOGUS_API UBuildingComponent : public UActorComponent
@@ -31,9 +33,22 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void UpdateBlueprintTransform(FTransform NewTransform);
+	// Called when the building mode activated
+	void InitiateBuilding();
+
+	// Called 
+	void UpdateBlueprintLocationAndRotation(FVector CameraLocation, FVector CameraForwardVector);
+
+	UFUNCTION()
+	void OnCameraLocationUpdate(FVector CameraLocation, FVector CameraForwardVector);
+
+	void ToggleBuildingMenu();
+	
+	
 
 public:
+	
+	FOnToggleBuildingMenuSignature OnToggleBuildingMenuDelegate;
 
 protected:
 
@@ -57,16 +72,14 @@ protected:
 	float BuildDistance = 1000.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Building, meta = (AllowPrivateAccess = "true"))
-	UDataTable* BuildingDataTable;
+	TObjectPtr<UDataTable> BuildingDataTable;
 
-	
-	OnUpdateBlueprintTransformDelegate OnUpdateBlueprintTransform;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Building)
+	TObjectPtr<AActor> BlueprintBuildingNodeActor;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|UI", meta = (AllowPrivateAccess = "true"))
+	TArray<TSubclassOf<AActor>> BlueprintBuildingNodeActorClasses;
 
-
-
-
-
+	bool bIsMenuShown = false;
 	
 };

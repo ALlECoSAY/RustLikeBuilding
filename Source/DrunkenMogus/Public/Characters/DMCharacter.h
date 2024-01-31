@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "DrunkenMogusCharacter.generated.h"
+#include "DMCharacter.generated.h"
 
 class UBuildingComponent;
 class USpringArmComponent;
@@ -16,14 +16,55 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
+
+DECLARE_DELEGATE_TwoParams(FOnUpdateLookSignature, /*Camera Location*/ FVector, /*Camera ForwardVector*/ FVector);
+
+
 UCLASS(config=Game)
-class ADrunkenMogusCharacter : public ACharacter
+class ADMCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+	
+public:
+	ADMCharacter();
+	
+
+protected:
+
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
+
+	void UpdateLook(FVector CameraLocation, FVector CameraForwardVector);
+
+protected:
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	// To add mapping context
+	virtual void BeginPlay();
+
+public:
+
+#pragma region Getters/Setters
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	/** Returns BuildingComponent subobject **/
+	FORCEINLINE class UBuildingComponent* GetBuildingComponent() const { return BuildingComponent; }
+
+	
+
+#pragma endregion
 
 public:
 	
 	
+	FOnUpdateLookSignature OnUpdateLookDelegate;
 
 protected:
 
@@ -61,35 +102,6 @@ protected:
 	UInputAction* LookAction;
 
 #pragma endregion
-
-	
-public:
-	ADrunkenMogusCharacter();
-	
-
-protected:
-
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
-	void Look(const FInputActionValue& Value);
-			
-
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	// To add mapping context
-	virtual void BeginPlay();
-
-public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-
 
 
 	

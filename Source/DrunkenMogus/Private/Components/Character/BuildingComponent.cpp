@@ -3,6 +3,8 @@
 
 #include "Components/Character/BuildingComponent.h"
 
+#include "Characters/DMCharacter.h"
+
 
 // Sets default values for this component's properties
 UBuildingComponent::UBuildingComponent()
@@ -22,7 +24,38 @@ void UBuildingComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+
+
+	const auto Character = CastChecked<ADMCharacter>(GetOwner());
 	
+	Character->OnUpdateLookDelegate.BindUObject(this, &UBuildingComponent::OnCameraLocationUpdate);
+	
+	
+
+	
+}
+
+void UBuildingComponent::InitiateBuilding()
+{
+	
+
+	
+}
+
+void UBuildingComponent::UpdateBlueprintLocationAndRotation(FVector CameraLocation, FVector CameraForwardVector)
+{
+	//todo: implement
+}
+
+void UBuildingComponent::OnCameraLocationUpdate(FVector CameraLocation, FVector CameraForwardVector)
+{
+	UpdateBlueprintLocationAndRotation(CameraLocation, CameraForwardVector);
+}
+
+void UBuildingComponent::ToggleBuildingMenu()
+{
+	bIsMenuShown = !bIsMenuShown;
+	OnToggleBuildingMenuDelegate.Execute(bIsMenuShown);
 }
 
 

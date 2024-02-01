@@ -42,9 +42,16 @@ protected:
 	UFUNCTION()
 	void OnCameraLocationUpdate(FVector CameraLocation, FVector CameraForwardVector);
 
-	void ToggleBuildingMenu();
-	
-	
+	void ToggleBuildingMode();
+	void OpenBuildingMenu();
+	void CloseBuildingMenu();
+
+	void AddBuildingInputMappingContext();
+	void RemoveBuildingInputMappingContext();
+	void BindInputActionsToCallbackFunctions();
+
+	void ToggleMenuModeOn();
+	void ToggleMenuModeOff();
 
 public:
 	
@@ -80,6 +87,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|UI", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AActor>> BlueprintBuildingNodeActorClasses;
 
-	bool bIsMenuShown = false;
+	bool bIsMenuModeToggled = false;
+
+	UPROPERTY(EditAnywhere, Category= Input,  meta = (AllowPrivateAccess = "true"))
+	int InputMappingContextPriority = 0;
 	
 };

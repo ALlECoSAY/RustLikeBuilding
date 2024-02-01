@@ -52,6 +52,9 @@ ADMCharacter::ADMCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	
+	//Create Building Component
+	BuildingComponent = CreateDefaultSubobject<UBuildingComponent>(TEXT("BuildingComponent"));
+	BuildingComponent->RegisterComponent();
 
 	
 }
@@ -68,16 +71,7 @@ void ADMCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
-	}
-
-	//If Autonomous proxy or server
-	if (GetLocalRole() >= ROLE_AutonomousProxy)
-	{
-		//Create Building Component
-		BuildingComponent = NewObject<UBuildingComponent>(this, TEXT("BuildingComponent"));
-		BuildingComponent->RegisterComponent();
-		BuildingComponent->Deactivate();
-	}
+	}	
 	
 }
 

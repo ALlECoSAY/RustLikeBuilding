@@ -17,7 +17,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 
-DECLARE_DELEGATE_TwoParams(FOnUpdateLookSignature, /*Camera Location*/ FVector, /*Camera ForwardVector*/ FVector);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateLookSignature, /*Camera Location*/ FVector, /*Camera ForwardVector*/ FVector);
 
 
 UCLASS(config=Game)

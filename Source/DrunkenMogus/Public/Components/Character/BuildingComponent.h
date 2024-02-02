@@ -10,8 +10,9 @@
 class UInputMappingContext;
 class UInputAction;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnToggleBuildingModeSignature,/*bIsActivated*/ bool);
 //HUD link to show/hide building menu
-DECLARE_DELEGATE_OneParam(FOnToggleBuildingMenuSignature,/*bIsShown*/ bool);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnToggleBuildingMenuSignature,/*bIsShown*/ bool);
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, BlueprintType)
@@ -43,18 +44,21 @@ protected:
 	void OnCameraLocationUpdate(FVector CameraLocation, FVector CameraForwardVector);
 
 	void ToggleBuildingMode();
-	void OpenBuildingMenu();
-	void CloseBuildingMenu();
+	void ActivateBuildingMode();
+	void DeactivateBuildingModeOff();
+	
+	void ToggleBuildingMenu();
+	void ShowBuildingMenu();
+	void HideBuildingMenu();
 
 	void AddBuildingInputMappingContext();
 	void RemoveBuildingInputMappingContext();
 	void BindInputActionsToCallbackFunctions();
 
-	void ToggleMenuModeOn();
-	void ToggleMenuModeOff();
 
 public:
 	
+	FOnToggleBuildingModeSignature OnToggleBuildingModeDelegate;
 	FOnToggleBuildingMenuSignature OnToggleBuildingMenuDelegate;
 
 protected:
@@ -67,11 +71,11 @@ protected:
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* BuildAction;
+	UInputAction* ToggleBuildingModeAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* ToggleBuildingMenuAction;
+	UInputAction* TriggerBuildingMenuAction;
 
 #pragma endregion
 
@@ -87,7 +91,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|UI", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AActor>> BlueprintBuildingNodeActorClasses;
 
-	bool bIsMenuModeToggled = false;
+	bool bIsBuildingModeActive = false;
+	bool bIsBuildingMenuShown = false;
 
 	UPROPERTY(EditAnywhere, Category= Input,  meta = (AllowPrivateAccess = "true"))
 	int InputMappingContextPriority = 0;

@@ -17,7 +17,7 @@ void ADMHUD::BeginPlay()
 	const auto PlayerCharacter = CastChecked<ADMCharacter>(PlayerController->GetPawn());
 
 	//bind the toggle building menu delegate
-	PlayerCharacter->GetBuildingComponent()->OnToggleBuildingMenuDelegate.BindUObject(this, &ThisClass::OnToggleBuildingMenu);
+	PlayerCharacter->GetBuildingComponent()->OnToggleBuildingModeDelegate.AddUObject(this, &ThisClass::OnToggleBuildingMenu);
 	
 	
 }

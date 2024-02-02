@@ -33,7 +33,7 @@ void UBuildingComponent::BeginPlay()
 
 	const auto Character = CastChecked<ADMCharacter>(GetOwner());
 	
-	Character->OnUpdateLookDelegate.BindUObject(this, &UBuildingComponent::OnCameraLocationUpdate);
+	Character->OnUpdateLookDelegate.AddUObject(this, &UBuildingComponent::OnCameraLocationUpdate);
 
 	AddBuildingInputMappingContext();
 	//todo error nptr exception, mb delegate firing
@@ -60,40 +60,43 @@ void UBuildingComponent::OnCameraLocationUpdate(FVector CameraLocation, FVector 
 void UBuildingComponent::ToggleBuildingMode()
 {
 	// Development only
-	UE_LOG(LogTemp, Warning, TEXT("ToggleBuildingMode"));
+	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 #if UE_BUILD_DEVELOPMENT
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
 #endif
 	
-
-	
-	bIsMenuModeToggled = !bIsMenuModeToggled;
-	if(bIsMenuModeToggled)
+	bIsBuildingModeActive = !bIsBuildingModeActive;
+	if(bIsBuildingModeActive)
 	{
-		ToggleMenuModeOn();
+		ActivateBuildingMode();
 	}
 	else
 	{
-		ToggleMenuModeOff();
+		DeactivateBuildingModeOff();
 	}
 }
 
-void UBuildingComponent::OpenBuildingMenu()
+void UBuildingComponent::ShowBuildingMenu()
 {
 
 #if UE_BUILD_DEVELOPMENT
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));			
 #endif
+
+	OnToggleBuildingMenuDelegate.Broadcast(true);
+	
 }
 
-void UBuildingComponent::CloseBuildingMenu()
+void UBuildingComponent::HideBuildingMenu()
 {
 #if UE_BUILD_DEVELOPMENT
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));			
 #endif
+	
+	OnToggleBuildingMenuDelegate.Broadcast(false);
 }
 
 void UBuildingComponent::AddBuildingInputMappingContext()
@@ -134,26 +137,43 @@ void UBuildingComponent::BindInputActionsToCallbackFunctions()
 	//bind the toggle building menu delegate
 	
 	// Toggle Building Mode
-	EnhancedInputComponent->BindAction(ToggleBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMode);
+	EnhancedInputComponent->BindAction(ToggleBuildingModeAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMode);
 
 	// Building Menu Open
-	EnhancedInputComponent->BindAction(BuildAction, ETriggerEvent::Triggered, this, &ThisClass::OpenBuildingMenu);
-	// Building Menu Close
-	EnhancedInputComponent->BindAction(BuildAction, ETriggerEvent::Completed, this, &ThisClass::CloseBuildingMenu);
+	EnhancedInputComponent->BindAction(TriggerBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMenu);
 	
 	
 }
 
-void UBuildingComponent::ToggleMenuModeOn()
+void UBuildingComponent::ActivateBuildingMode()
 {
 	SetComponentTickEnabled(true);
-	OnToggleBuildingMenuDelegate.Execute(true);
+	OnToggleBuildingModeDelegate.Broadcast(true);
 }
 
-void UBuildingComponent::ToggleMenuModeOff()
+void UBuildingComponent::DeactivateBuildingModeOff()
 {
 	SetComponentTickEnabled(false);
-	OnToggleBuildingMenuDelegate.Execute(false);
+	OnToggleBuildingModeDelegate.Broadcast(false);
+}
+
+void UBuildingComponent::ToggleBuildingMenu()
+{
+	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
+#if UE_BUILD_DEVELOPMENT
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
+#endif
+	
+	bIsBuildingMenuShown = !bIsBuildingMenuShown;
+	if(bIsBuildingMenuShown)
+	{
+		ShowBuildingMenu();
+	}
+	else
+	{
+		HideBuildingMenu();
+	}
 }
 
 

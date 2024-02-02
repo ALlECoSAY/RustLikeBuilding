@@ -36,21 +36,22 @@ protected:
 
 	// Called when the building mode activated
 	void InitiateBuilding();
-
-	// Called 
+	
 	void UpdateBlueprintLocationAndRotation(FVector CameraLocation, FVector CameraForwardVector);
 
+	// Callback on Look action
 	UFUNCTION()
 	void OnCameraLocationUpdate(FVector CameraLocation, FVector CameraForwardVector);
 
+	// Building Mode input handling 
 	void ToggleBuildingMode();
 	void ActivateBuildingMode();
 	void DeactivateBuildingModeOff();
-	
+	// Building Menu input handling
 	void ToggleBuildingMenu();
 	void ShowBuildingMenu();
 	void HideBuildingMenu();
-
+	// Input mappings management
 	void AddBuildingInputMappingContext();
 	void RemoveBuildingInputMappingContext();
 	void BindInputActionsToCallbackFunctions();

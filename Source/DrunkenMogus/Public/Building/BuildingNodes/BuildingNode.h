@@ -15,6 +15,12 @@ struct FBuildingNodeInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ABuildingNode> BuildingNodeClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> ActualStaticMeshComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> BlueprintStaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float MaxSnappingRadius = 0.0f;
@@ -41,20 +47,43 @@ public:
 	// Sets default values for this actor's properties
 	ABuildingNode();
 
+#pragma region GET/SET
+
+
+	
+#pragma endregion
 	
 
 protected:
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
+	virtual void Tick(float DeltaSeconds) override;
+	
+#if WITH_EDITOR
+	// DebugDrawAnchorPoints
+	void Debug_DrawAnchorSockets(float Time = -1.0f); 
+#endif
+
+	
+
+public:
+
+	
+protected:
+
 	
 	
 
+#if WITH_EDITORONLY_DATA
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
+	bool bDrawDebugAnchors = false;
+	
+#endif
 
 	
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> BlueprintStaticMeshComponent;
-	
-
 };

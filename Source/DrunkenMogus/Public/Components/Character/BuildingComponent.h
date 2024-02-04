@@ -76,7 +76,7 @@ protected:
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* TriggerBuildingMenuAction;
+	UInputAction* ToggleBuildingMenuAction;
 
 #pragma endregion
 

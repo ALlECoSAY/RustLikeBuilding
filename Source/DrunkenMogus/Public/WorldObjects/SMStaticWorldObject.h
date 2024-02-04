@@ -11,9 +11,16 @@ class DRUNKENMOGUS_API ASMStaticWorldObject : public AStaticWorldObject
 {
 	GENERATED_BODY()
 
+
 public:
 	ASMStaticWorldObject();
 
+#pragma region GET/SET
+
+	FORCEINLINE TObjectPtr<UStaticMeshComponent> GetStaticMeshComponent() const { return StaticMeshComponent; }
+	FORCEINLINE void SetStaticMeshComponent(TObjectPtr<UStaticMeshComponent> val) { StaticMeshComponent = val; }
+
+#pragma endregion
 
 protected:
 	

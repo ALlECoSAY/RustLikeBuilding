@@ -61,10 +61,11 @@ void UBuildingComponent::ToggleBuildingMode()
 {
 	// Development only
 	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
-#if UE_BUILD_DEVELOPMENT
+#if WITH_EDITOR
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
 #endif
+	
 	
 	bIsBuildingModeActive = !bIsBuildingModeActive;
 	if(bIsBuildingModeActive)
@@ -80,7 +81,7 @@ void UBuildingComponent::ToggleBuildingMode()
 void UBuildingComponent::ShowBuildingMenu()
 {
 
-#if UE_BUILD_DEVELOPMENT
+#if WITH_EDITOR
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));			
 #endif
@@ -91,7 +92,7 @@ void UBuildingComponent::ShowBuildingMenu()
 
 void UBuildingComponent::HideBuildingMenu()
 {
-#if UE_BUILD_DEVELOPMENT
+#if WITH_EDITOR
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));			
 #endif
@@ -140,7 +141,7 @@ void UBuildingComponent::BindInputActionsToCallbackFunctions()
 	EnhancedInputComponent->BindAction(ToggleBuildingModeAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMode);
 
 	// Building Menu Open
-	EnhancedInputComponent->BindAction(TriggerBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMenu);
+	EnhancedInputComponent->BindAction(ToggleBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMenu);
 	
 	
 }
@@ -160,7 +161,7 @@ void UBuildingComponent::DeactivateBuildingModeOff()
 void UBuildingComponent::ToggleBuildingMenu()
 {
 	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
-#if UE_BUILD_DEVELOPMENT
+#if WITH_EDITOR
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
 #endif
@@ -169,6 +170,7 @@ void UBuildingComponent::ToggleBuildingMenu()
 	if(bIsBuildingMenuShown)
 	{
 		ShowBuildingMenu();
+		
 	}
 	else
 	{

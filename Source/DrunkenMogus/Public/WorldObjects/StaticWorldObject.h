@@ -19,7 +19,6 @@ protected:
 
 
 protected:
-	FVector FixedLocation = { 0, 0, 0};
 
 	/**
 	 * Root World Object to which this* is attached

@@ -5,6 +5,10 @@
 
 AWorldObject::AWorldObject()
 {
+
+	const auto NewRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	SetRootComponent(NewRootComponent);
+	
 }
 
 

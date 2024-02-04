@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "DrunkenMogusGameMode.generated.h"
+#include "DMGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ADrunkenMogusGameMode : public AGameModeBase
+class ADMGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ADrunkenMogusGameMode();
+	ADMGameMode();
 };
 
 

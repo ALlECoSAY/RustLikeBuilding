@@ -3,38 +3,50 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Building/UtilsBuilding.h"
 #include "WorldObjects/SMStaticWorldObject.h"
 #include "BuildingNode.generated.h"
 
 class ABuildingNode;
 
 USTRUCT(BlueprintType, Blueprintable)
+struct FBuildingNodeResourceCost
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResourceType"))
+	int32 BuildingCost[(uint8)(EResourceType::MAX)];
+	
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResourceType"))
+	int32 MaintenanceCost[(uint8)(EResourceType::MAX)];
+
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResourceType"))
+	int32 RepairCost[(uint8)(EResourceType::MAX)];
+	
+};
+
+
+USTRUCT(BlueprintType, Blueprintable)
 struct FBuildingNodeInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABuildingNode> BuildingNodeClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> ActualStaticMeshComponent;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> BlueprintStaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere)
 	float MaxSnappingRadius = 0.0f;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	//float MinSnappingRadius = 0.0f; //if not 0, then does sphere trace
-	
-	// Cost of building this node
-	// Cost of maintaining this node
-	//TArray<UBuildingResource>
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EBuildingGradeType"))
+	FBuildingNodeResourceCost ConstructionResourceCost[(uint8)EBuildingGradeType::MAX];
 
-	//
-
-	
 };
 
 
@@ -62,6 +74,8 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	
 	virtual void Tick(float DeltaSeconds) override;
+
+	//virtual void 
 	
 #if WITH_EDITOR
 	// DebugDrawAnchorPoints

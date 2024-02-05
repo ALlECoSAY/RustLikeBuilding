@@ -6,7 +6,6 @@
 
 #include "CoreMinimal.h"
 
-
 UENUM(BlueprintType, Category = "Building|Socket", meta = (DisplayName = "Socket Type"))
 enum class EBuildingSocketType : uint8
 {
@@ -18,7 +17,7 @@ enum class EBuildingSocketType : uint8
 
 
 
-UENUM(BlueprintType, Category = "Building|Grade", meta = (DisplayName = "Grade Type"))
+UENUM(BlueprintType, Category = "Building|Grade", meta = (DisplayName = "Resource Type"))
 enum class EBuildingGradeType : uint8
 {
  Grade1 UMETA(DisplayName = "Grade 1"),

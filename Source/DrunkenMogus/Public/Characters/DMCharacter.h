@@ -17,8 +17,9 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateLookSignature, /*Camera Location*/ FVector, /*Camera ForwardVector*/ FVector);
-
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateFocusSignature, /*Camera Location*/ FVector, /*Camera ForwardVector*/ FVector);
+//non dynamic version
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnCharacterMovedSignature, /*DeltaSeconds*/ float, /*OldLocation*/ FVector, /*OldVelocity*/ FVector);
 
 UCLASS(config=Game)
 class ADMCharacter : public ACharacter
@@ -64,7 +65,7 @@ public:
 public:
 	
 	
-	FOnUpdateLookSignature OnUpdateLookDelegate;
+	FOnUpdateFocusSignature OnUpdateFocusDelegate;
 
 protected:
 

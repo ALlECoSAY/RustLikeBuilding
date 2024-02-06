@@ -55,7 +55,6 @@ ADMCharacter::ADMCharacter()
 	//Create Building Component
 	BuildingComponent = CreateDefaultSubobject<UBuildingComponent>(TEXT("BuildingComponent"));
 	
-
 	
 }
 
@@ -138,5 +137,5 @@ void ADMCharacter::Look(const FInputActionValue& Value)
 
 void ADMCharacter::UpdateLook(FVector CameraLocation, FVector CameraForwardVector)
 {
-	OnUpdateLookDelegate.Broadcast(CameraLocation, CameraForwardVector);
+	OnUpdateFocusDelegate.Broadcast(CameraLocation, CameraForwardVector);
 }

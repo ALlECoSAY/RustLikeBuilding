@@ -5,8 +5,10 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
 #include "Characters/DMCharacter.h"
 #include "Controllers/DMPlayerController.h"
+#include "GameInstances/DMGameInstance.h"
 
 
 // Sets default values for this component's properties
@@ -31,35 +33,76 @@ void UBuildingComponent::BeginPlay()
 	// ...
 
 
-	const auto Character = CastChecked<ADMCharacter>(GetOwner());
+	//get GameInstance
+	const auto GameInstance = CastChecked<UDMGameInstance>(GetWorld()->GetGameInstance());
+
+	//todo get the building data table 
+	//BuildingNodesInfos = GameInstance->GetBuildingNodesInfos();
 	
-	Character->OnUpdateLookDelegate.AddUObject(this, &UBuildingComponent::OnCameraLocationUpdate);
+	const auto Character = CastChecked<ADMCharacter>(GetOwner());
+	//bind view update to the camera transform update
+	Character->GetFollowCamera()->TransformUpdated.AddUObject(this, &ThisClass::OnCharacterFollowCameraTransformUpdate);
 
 	AddBuildingInputMappingContext();
+	
 	//todo error nptr exception, mb delegate firing
 	BindInputActionsToCallbackFunctions();
-}
 
-void UBuildingComponent::InitiateBuilding()
-{
-	
 
+	//setup deafault values for building
+	SetupDefaults();
 	
 }
 
-void UBuildingComponent::UpdateBlueprintLocationAndRotation(FVector CameraLocation, FVector CameraForwardVector)
+void UBuildingComponent::SetupDefaults()
 {
-	//todo: implement
+	//CurrentBuildingNodeInfo = 
+	
+	
 }
 
-void UBuildingComponent::OnCameraLocationUpdate(FVector CameraLocation, FVector CameraForwardVector)
+
+void UBuildingComponent::UpdateBuildingView(FVector CameraLocation, FVector CameraForwardVector)
 {
-	UpdateBlueprintLocationAndRotation(CameraLocation, CameraForwardVector);
+	UpdateFocusLocation(CameraLocation, CameraForwardVector);
+	UpdateSnappedLocation(CameraLocation, CameraForwardVector);
+
+	
+#if WITH_EDITOR
+	Debug_DrawDebug();
+#endif
+}
+
+void UBuildingComponent::UpdateFocusLocation(FVector CameraLocation, FVector CameraForwardVector)
+{
+	FocusLocation = CameraLocation + CameraForwardVector * BuildDistance;
+}
+
+void UBuildingComponent::UpdateSnappedLocation(FVector CameraLocation, FVector CameraForwardVector)
+{
+	//todo: implement snapping to the grid
+	SnappedLocation = FocusLocation - FVector::UpVector * 200.0f;
+}
+
+void UBuildingComponent::OnCharacterFollowCameraTransformUpdate(USceneComponent* UpdatedComponent,
+	EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
+{
+	const auto Character = CastChecked<ADMCharacter>(GetOwner());
+	const auto CameraComponent = Character->GetFollowCamera();
+	const auto CameraLocation = CameraComponent->GetComponentLocation();
+
+	const auto PlayerController = GetOwner()->GetInstigatorController();
+
+	check(PlayerController);
+
+	//const auto ForwardVector = PlayerController->GetControlRotation().Vector();
+	const auto CameraForwardVector = CameraComponent->GetForwardVector();
+
+	UpdateBuildingView(CameraLocation, CameraForwardVector);
 }
 
 void UBuildingComponent::ToggleBuildingMode()
 {
-	// Development only
 	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 #if WITH_EDITOR
 	if(GEngine)
@@ -142,9 +185,20 @@ void UBuildingComponent::BindInputActionsToCallbackFunctions()
 
 	// Building Menu Open
 	EnhancedInputComponent->BindAction(ToggleBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMenu);
-	
+		
+}
+
+#if WITH_EDITOR
+void UBuildingComponent::Debug_DrawDebug()
+{
+	//draw debug FocusLocation
+	DrawDebugSphere(GetWorld(), FocusLocation, 15.0f, 12, FColor::Magenta, false, 0, 10, 3.f);
+
+	//draw debug SnappedLocation
+	DrawDebugSphere(GetWorld(), SnappedLocation, 25.0f, 12, FColor::Green, false, 0, 10, 3.f);
 	
 }
+#endif
 
 void UBuildingComponent::ActivateBuildingMode()
 {

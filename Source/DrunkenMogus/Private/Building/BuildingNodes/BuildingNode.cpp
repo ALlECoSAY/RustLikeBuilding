@@ -35,7 +35,7 @@ void ABuildingNode::Tick(float DeltaSeconds)
 
 #if WITH_EDITOR
 
-	if (bDrawDebugAnchors)
+	if (bDebug)
 	{
 		Debug_DrawAnchorSockets(0);	
 	}
@@ -49,37 +49,14 @@ void ABuildingNode::Tick(float DeltaSeconds)
 #if WITH_EDITOR
 void ABuildingNode::Debug_DrawAnchorSockets(float Time)
 {
-	/*// drawdebug doesn't work with -1 time persistent lines for some reason (reason: OnConstruction incompatibility)
-	if (Time!=0)
-	{
-		Time = TNumericLimits<float>::Max();
-	}
-	*/
-
-	//todo: optional add engine only debug visual components and update in OnConstruction()
-	
-	//get sockets
-	/*TArray<FName> SocketNames = GetStaticMeshComponent()->GetAllSocketNames();
-
-	for (auto& SocketName : SocketNames)
-	{
-		FVector SocketLocation = GetStaticMeshComponent()->GetSocketLocation(SocketName);
-		DrawDebugSphere(GetWorld(), SocketLocation, 15.0f, 12, FColor::Red, false, Time, 0, 1.5f);
-		//Subscribe text
-		DrawDebugString(GetWorld(), SocketLocation, SocketName.ToString(), nullptr, FColor::Red, Time, false, 0.75f);
-	}
-	*/
-
 	const auto ActorLocation = GetActorLocation();
 
 	const auto GameInst = CastChecked<UDMGameInstance>(GetGameInstance());
-	
-	TMap<EBuildingSocketType, FName> SocketTypeToFName = GameInst->SocketTypeToFName;
 
 	//get sockets by tag
-	const TArray<UStaticMeshSocket*> CenterSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(SocketTypeToFName.Find(EBuildingSocketType::Center)->ToString());
-	const TArray<UStaticMeshSocket*> SideSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(SocketTypeToFName.Find(EBuildingSocketType::Side)->ToString());
-	const TArray<UStaticMeshSocket*> CornerSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(SocketTypeToFName.Find(EBuildingSocketType::Corner)->ToString());
+	const TArray<UStaticMeshSocket*> CenterSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Center).ToString());
+	const TArray<UStaticMeshSocket*> SideSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Side).ToString());
+	const TArray<UStaticMeshSocket*> CornerSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Corner).ToString());
 
 	
 	for (auto& Socket : CenterSockets)

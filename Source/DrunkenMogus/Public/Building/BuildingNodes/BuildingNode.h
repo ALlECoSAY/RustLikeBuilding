@@ -33,6 +33,9 @@ struct FBuildingNodeInfo : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
+	EBuildingNodeType BuildingNodeType;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABuildingNode> BuildingNodeClass;
 	
 	UPROPERTY(EditAnywhere)
@@ -95,7 +98,7 @@ protected:
 #if WITH_EDITORONLY_DATA
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
-	bool bDrawDebugAnchors = false;
+	bool bDebug = false;
 	
 #endif
 

@@ -7,6 +7,7 @@
 #include "Engine/GameInstance.h"
 #include "DMGameInstance.generated.h"
 
+struct FBuildingNodeInfo;
 /**
  * 
  */
@@ -16,13 +17,26 @@ class DRUNKENMOGUS_API UDMGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 
+protected:
+	virtual void Init() override;
+
+
 public:
+
+#pragma region GET/SET
+
+	FORCEINLINE TObjectPtr<UDataTable> GetBuildingDataTable() const { return BuildingDataTable; }
+	FORCEINLINE FName GetSocketNameByType(EBuildingSocketType Type) const { return SocketTypeToFName[Type]; }
+	FORCEINLINE FBuildingNodeInfo* GetBuildingNodeInfo(EBuildingNodeType Type) const { return BuildingNodesInfos[(uint8)Type]; }
+	
+protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Building|Meshes|Sockets", meta = (AllowPrivateAccess = "true"))
 	TMap<EBuildingSocketType,FName> SocketTypeToFName;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Building, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDataTable> BuildingDataTable;
 
-
+	FBuildingNodeInfo* BuildingNodesInfos[(uint8)EBuildingNodeType::MAX];  
 	
 };

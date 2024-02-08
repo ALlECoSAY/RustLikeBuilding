@@ -71,18 +71,16 @@ public:
 
 protected:
 	
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	virtual void OnConstruction(const FTransform& Transform) override;
 	
 	virtual void Tick(float DeltaSeconds) override;
 
-	//virtual void 
 	
 #if WITH_EDITOR
-	// DebugDrawAnchorPoints
-	void Debug_DrawAnchorSockets(float Time = -1.0f); 
+	// DebugDraw
+	void Debug_Draw(float Time = -1.0f) const;
+	void Debug_DrawAnchorSocketsSpheres(TArray<UStaticMeshSocket*>* Sockets) const;
+	void Debug_DrawAnchorSocketsText(TArray<UStaticMeshSocket*>* Sockets) const;
 #endif
 
 	
@@ -99,6 +97,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
 	bool bDebug = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug|Advanced", meta = (AllowPrivateAccess = "true"))
+	bool bDebugDrawAnchorSocketsSpheres = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug|Advanced", meta = (AllowPrivateAccess = "true"))
+	bool bDebugDrawAnchorSocketsText = true;
+
 	
 #endif
 

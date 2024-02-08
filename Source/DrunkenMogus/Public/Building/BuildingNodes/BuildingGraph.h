@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "BuildingGraph.generated.h"
 
+class ABuildingNode;
 /**
  * 
  */
@@ -16,12 +17,8 @@ class DRUNKENMOGUS_API UBuildingGraph : public UObject
 
 
 public:
-
-
-
-protected:
-
 	
-	
+	UPROPERTY()
+	TArray<TObjectPtr<ABuildingNode>> Nodes;
 	
 };

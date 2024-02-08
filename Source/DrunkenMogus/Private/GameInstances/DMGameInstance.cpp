@@ -17,6 +17,7 @@ void UDMGameInstance::Init()
 	TArray<FBuildingNodeInfo*> OutRows;
 	GetBuildingDataTable()->GetAllRows(Context, OutRows);
 
+	
 	check(OutRows.Num() == (uint8)EBuildingNodeType::MAX);
 	
 	auto BuildingTypeIterateCheck = 0;

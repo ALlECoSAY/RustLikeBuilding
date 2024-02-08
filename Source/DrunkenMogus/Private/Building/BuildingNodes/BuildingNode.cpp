@@ -23,11 +23,6 @@ void ABuildingNode::BeginPlay()
 	
 }
 
-void ABuildingNode::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	
-}
 
 void ABuildingNode::Tick(float DeltaSeconds)
 {
@@ -37,7 +32,7 @@ void ABuildingNode::Tick(float DeltaSeconds)
 
 	if (bDebug)
 	{
-		Debug_DrawAnchorSockets(0);	
+		Debug_Draw(0);	
 	}
 	
 #endif
@@ -47,10 +42,9 @@ void ABuildingNode::Tick(float DeltaSeconds)
 
 
 #if WITH_EDITOR
-void ABuildingNode::Debug_DrawAnchorSockets(float Time)
+void ABuildingNode::Debug_Draw(float Time) const
 {
-	const auto ActorLocation = GetActorLocation();
-
+	
 	const auto GameInst = CastChecked<UDMGameInstance>(GetGameInstance());
 
 	//get sockets by tag
@@ -58,31 +52,61 @@ void ABuildingNode::Debug_DrawAnchorSockets(float Time)
 	const TArray<UStaticMeshSocket*> SideSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Side).ToString());
 	const TArray<UStaticMeshSocket*> CornerSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Corner).ToString());
 
-	
-	for (auto& Socket : CenterSockets)
+	TArray<UStaticMeshSocket*> AllSockets[(uint8)EBuildingSocketType::MAX] = {CenterSockets, SideSockets, CornerSockets};
+
+	if (bDebugDrawAnchorSocketsSpheres)
 	{
-		FVector SocketLocation = Socket->RelativeLocation + ActorLocation;
-		DrawDebugSphere(GetWorld(), SocketLocation, 15.0f, 12, FColor::Red, false, Time, 1, 2.f);
-		//Subscribe text
-		DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, Time, false, 0.75f);
+		Debug_DrawAnchorSocketsSpheres(AllSockets);
 	}
 
-	for (auto& Socket : SideSockets)
+	if (bDebugDrawAnchorSocketsText)
 	{
-		FVector SocketLocation = Socket->RelativeLocation + ActorLocation;
-		DrawDebugSphere(GetWorld(), SocketLocation, 10.0f, 12, FColor::Green, false, Time, 1, 1.5f);
-		//Subscribe text
-		DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, Time, false, 0.75f);
+		Debug_DrawAnchorSocketsText(AllSockets);
+	}	
+}
+
+void ABuildingNode::Debug_DrawAnchorSocketsSpheres(TArray<UStaticMeshSocket*>* Sockets) const
+{
+	for (auto& Socket : Sockets[(uint8)EBuildingSocketType::Center])
+	{
+		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
+		DrawDebugSphere(GetWorld(), SocketLocation, 15.0f, 12, FColor::Red, false, 0, 1, 2.f);
+		
 	}
 
-	for (auto& Socket : CornerSockets)
+	for (auto& Socket : Sockets[(uint8)EBuildingSocketType::Side])
 	{
-		FVector SocketLocation = Socket->RelativeLocation + ActorLocation;
-		DrawDebugSphere(GetWorld(), SocketLocation, 7.0f, 12, FColor::Blue, false, Time, 1, 1.f);
-		//Subscribe text
-		DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, Time, false, 0.75f);
+		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
+		DrawDebugSphere(GetWorld(), SocketLocation, 10.0f, 12, FColor::Green, false, 0, 1, 1.5f);
+		
 	}
-	
+
+	for (auto& Socket : Sockets[(uint8)EBuildingSocketType::Corner])
+	{
+		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
+		DrawDebugSphere(GetWorld(), SocketLocation, 7.0f, 12, FColor::Blue, false, 0, 1, 1.f);
+	}
+}
+
+void ABuildingNode::Debug_DrawAnchorSocketsText(TArray<UStaticMeshSocket*>* Sockets) const
+{
+	for (auto& Socket : Sockets[(uint8)EBuildingSocketType::Center])
+	{
+		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
+			DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, 0, false, 0.75f);
+	}
+
+	for (auto& Socket : Sockets[(uint8)EBuildingSocketType::Side])
+	{
+		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
+			DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, 0, false, 0.75f);
+	}
+
+	for (auto& Socket : Sockets[(uint8)EBuildingSocketType::Corner])
+	{
+		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
+			DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, 0, false, 0.75f);
+	}
 }
 #endif
 

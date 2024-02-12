@@ -20,6 +20,8 @@ class DRUNKENMOGUS_API UDMGameInstance : public UGameInstance
 protected:
 	virtual void Init() override;
 
+	
+
 
 public:
 
@@ -27,7 +29,7 @@ public:
 
 	FORCEINLINE TObjectPtr<UDataTable> GetBuildingDataTable() const { return BuildingDataTable; }
 	FORCEINLINE FName GetSocketNameByType(EBuildingSocketType Type) const { return SocketTypeToFName[Type]; }
-	FORCEINLINE FBuildingNodeInfo* GetBuildingNodeInfo(EBuildingNodeType Type) const { return BuildingNodesInfos[(uint8)Type]; }
+	FORCEINLINE FBuildingNodeInfo* GetBuildingNodeInfo(EBuildingNode Type) const { return BuildingNodesInfos[(uint8)Type]; }
 	
 protected:
 
@@ -37,6 +39,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Building, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDataTable> BuildingDataTable;
 
-	FBuildingNodeInfo* BuildingNodesInfos[(uint8)EBuildingNodeType::MAX];  
+	FBuildingNodeInfo* BuildingNodesInfos[(uint8)EBuildingNode::MAX];  
 	
 };

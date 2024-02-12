@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameState.h"
-#include "DMGameState.generated.h"
+#include "DMGameMode.h"
+#include "OpenWorldDMGameMode.generated.h"
 
 
 class UBuildingGraph;
@@ -12,13 +12,18 @@ class UBuildingGraph;
  * 
  */
 UCLASS()
-class DRUNKENMOGUS_API ADMGameState : public AGameState
+class DRUNKENMOGUS_API AOpenWorldDMGameMode : public ADMGameMode
 {
 	GENERATED_BODY()
 
 
+public:
 
-private:
+	
+
+
+protected:
+
 
 	UPROPERTY()
 	TArray<TObjectPtr<UBuildingGraph>> BuildingGraphs;

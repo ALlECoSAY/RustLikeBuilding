@@ -8,6 +8,7 @@
 #include "WorldObjects/SMStaticWorldObject.h"
 #include "BuildingNode.generated.h"
 
+class AStaticMeshActor;
 class ABuildingNode;
 
 USTRUCT(BlueprintType, Blueprintable)
@@ -15,14 +16,14 @@ struct FBuildingNodeResourceCost
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResourceType"))
-	int32 BuildingCost[(uint8)(EResourceType::MAX)];
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResource"))
+	int32 ConstructionCost[(uint8)(EResource::MAX)];
 	
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResourceType"))
-	int32 MaintenanceCost[(uint8)(EResourceType::MAX)];
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResource"))
+	int32 MaintenanceCost[(uint8)(EResource::MAX)];
 
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResourceType"))
-	int32 RepairCost[(uint8)(EResourceType::MAX)];
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResource"))
+	int32 RepairCost[(uint8)(EResource::MAX)];
 	
 };
 
@@ -33,22 +34,19 @@ struct FBuildingNodeInfo : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	EBuildingNodeType BuildingNodeType;
+	EBuildingNode BuildingNodeType;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABuildingNode> BuildingNodeClass;
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> ActualStaticMeshComponent;
-	
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> BlueprintStaticMeshComponent;
+	TSubclassOf<AStaticMeshActor> BlueprintBuildingNodeClass;
 
 	UPROPERTY(EditAnywhere)
 	float MaxSnappingRadius = 0.0f;
 
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EBuildingGradeType"))
-	FBuildingNodeResourceCost ConstructionResourceCost[(uint8)EBuildingGradeType::MAX];
+	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EBuildingGrade"))
+	FBuildingNodeResourceCost BuildingNodeResourceCost[(uint8)EBuildingGrade::MAX];
 
 };
 
@@ -64,7 +62,8 @@ public:
 
 #pragma region GET/SET
 
-
+	FORCEINLINE EBuildingNode GetBuildingNodeType() const { return BuildingNodeType; }
+	FORCEINLINE EBuildingGrade GetBuildingGradeType() const { return BuildingGradeType; }
 	
 #pragma endregion
 	
@@ -76,12 +75,7 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	
-#if WITH_EDITOR
-	// DebugDraw
-	void Debug_Draw(float Time = -1.0f) const;
-	void Debug_DrawAnchorSocketsSpheres(TArray<UStaticMeshSocket*>* Sockets) const;
-	void Debug_DrawAnchorSocketsText(TArray<UStaticMeshSocket*>* Sockets) const;
-#endif
+
 
 	
 
@@ -90,22 +84,32 @@ public:
 	
 protected:
 
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|Info", meta = (AllowPrivateAccess = "true"))
+	EBuildingNode BuildingNodeType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|Info", meta = (AllowPrivateAccess = "true"))
+	EBuildingGrade BuildingGradeType;
+
+#pragma region Debug
+public:
+#if WITH_EDITOR
+	// DebugDraw	
+	void Debug_Draw(float Time = -1.0f) const;
+	void Debug_DrawSnapSockets(TArray<UStaticMeshSocket*>* Sockets) const;
+	void Debug_DrawAnchorSockets(TArray<UStaticMeshSocket*>* Sockets) const;
+#endif
 #if WITH_EDITORONLY_DATA
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
 	bool bDebug = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug|Advanced", meta = (AllowPrivateAccess = "true"))
-	bool bDebugDrawAnchorSocketsSpheres = true;
+	bool bDebugDrawAnchorSockets = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug|Advanced", meta = (AllowPrivateAccess = "true"))
-	bool bDebugDrawAnchorSocketsText = true;
-
+	bool bDebugDrawSnapSockets = true;
 	
 #endif
+#pragma endregion
 
-	
 };

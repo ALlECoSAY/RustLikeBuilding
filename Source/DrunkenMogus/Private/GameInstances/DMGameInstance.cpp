@@ -9,6 +9,10 @@ void UDMGameInstance::Init()
 {
 	Super::Init();
 
+	//if server
+
+
+	
 	//todo load BuildingNodeInfo datatable
 	//BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
 	check(BuildingDataTable);
@@ -18,7 +22,7 @@ void UDMGameInstance::Init()
 	GetBuildingDataTable()->GetAllRows(Context, OutRows);
 
 	
-	check(OutRows.Num() == (uint8)EBuildingNodeType::MAX);
+	check(OutRows.Num() == (uint8)EBuildingNode::MAX);
 	
 	auto BuildingTypeIterateCheck = 0;
 	

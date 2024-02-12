@@ -18,7 +18,7 @@ enum class EBuildingSocketType : uint8
 
 
 UENUM(BlueprintType, Category = "Building|Grade", meta = (DisplayName = "Resource Type"))
-enum class EBuildingGradeType : uint8
+enum class EBuildingGrade : uint8
 {
  Grade1 UMETA(DisplayName = "Grade 1"),
  Grade2 UMETA(DisplayName = "Grade 2"),
@@ -27,16 +27,17 @@ enum class EBuildingGradeType : uint8
 };
 
 UENUM(BlueprintType, Category = "Building", meta = (DisplayName = "BuildingNode Type"))
-enum class EBuildingNodeType : uint8
+enum class EBuildingNode : uint8
 {
  Wall UMETA(DisplayName = "Wall"),
  SquareFoundation UMETA(DisplayName = "Square Foundation"),
+ TriangleFoundation UMETA(DisplayName = "Triangle Foundation"),
  MAX UMETA(Hidden = "true")
 };
 
 
 UENUM(BlueprintType, Category = "Resource", meta = (DisplayName = "Resource Type"))
-enum class EResourceType : uint8
+enum class EResource : uint8
 {
  ResourceA UMETA(DisplayName = "Resource A"),
  ResourceB UMETA(DisplayName = "Resource B"),
@@ -50,14 +51,17 @@ enum class EResourceType : uint8
 class DRUNKENMOGUS_API EnumHelpers
 {
 public:
- static FString EnumToString(EBuildingNodeType Enum)
+ static FString EnumToString(EBuildingNode Enum)
  {
   switch (Enum)
   { 
-  case EBuildingNodeType::Wall: return "Wall";
-  case EBuildingNodeType::SquareFoundation: return "SquareFoundation";
-  case EBuildingNodeType::MAX: return "MAX";
-  default: return "unknown";
+  case EBuildingNode::Wall: return "Wall";
+  case EBuildingNode::SquareFoundation: return "SquareFoundation";
+  case EBuildingNode::TriangleFoundation: return "TriangleFoundation";
+  case EBuildingNode::MAX: return "MAX";
+  default:
+   checkNoEntry()
+   return "unknown";
   }
  }
 

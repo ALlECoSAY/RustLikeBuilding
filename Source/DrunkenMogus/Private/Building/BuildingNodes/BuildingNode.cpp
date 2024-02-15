@@ -14,6 +14,12 @@ ABuildingNode::ABuildingNode()
 }
 
 
+float ABuildingNode::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
 // Called when the game starts or when spawned
 void ABuildingNode::BeginPlay()
 {

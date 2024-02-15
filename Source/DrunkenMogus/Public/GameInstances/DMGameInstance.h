@@ -39,6 +39,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Building, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDataTable> BuildingDataTable;
 
-	FBuildingNodeInfo* BuildingNodesInfos[(uint8)EBuildingNode::MAX];  
-	
+	FBuildingNodeInfo* BuildingNodesInfos[(uint8)EBuildingNode::MAX];
+
+
 };

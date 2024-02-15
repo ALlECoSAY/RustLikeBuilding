@@ -21,11 +21,11 @@ protected:
 protected:
 
 	/**
-	 * Root World Object to which this* is attached
+	 * Root World Actor to which this* is attached
 	 * Used to unlink from the root it in case of destruction
 	 */
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<AActor> RootObject;
+	TObjectPtr<AActor> RootActor;
 
 	
 	

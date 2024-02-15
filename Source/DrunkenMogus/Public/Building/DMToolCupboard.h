@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UtilsBuilding.h"
 #include "WorldObjects/SMStaticWorldObject.h"
 #include "DMToolCupboard.generated.h"
 
+class UBuildingGraph;
 class AFoundationBuildingNode;
 
 UCLASS()
@@ -18,10 +20,10 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 
+	
+	
 #pragma region GET/SET
 
-	FORCEINLINE AFoundationBuildingNode* GetFoundationBuildingNode() const { return FoundationBuildingNode; }
-	FORCEINLINE void SetFoundationBuildingNode(AFoundationBuildingNode* Value) { FoundationBuildingNode = Value; }
 	
 #pragma endregion
 
@@ -29,10 +31,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	
+
+	void Decay();
 
 protected:
 
 	UPROPERTY()
-	TObjectPtr<AFoundationBuildingNode> FoundationBuildingNode;
+	TObjectPtr<UBuildingGraph> BuildingGraph;
+
+	UPROPERTY()
+	int32 MaintenanceCost[(uint8)(EResource::MAX)];
 	
 };

@@ -15,6 +15,7 @@ ARopeDoor::ARopeDoor()
 void ARopeDoor::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 }
 
@@ -22,6 +23,7 @@ void ARopeDoor::BeginPlay()
 void ARopeDoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 }
 

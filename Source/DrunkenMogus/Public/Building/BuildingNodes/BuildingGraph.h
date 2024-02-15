@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Containers/Map.h"
 #include "Building/UtilsBuilding.h"
 #include "UObject/Object.h"
 #include "BuildingGraph.generated.h"
 
+class ADMToolCupboard;
 class ABuildingNode;
+
 /**
  * 
  */
@@ -22,7 +25,7 @@ struct FBuildingGraphArc
 	ABuildingNode* EndNode;
 
 	UPROPERTY()
-	float Weight;
+	EBuildingNode ArcType;
 };
 
 
@@ -47,10 +50,15 @@ public:
 	// All nodes in the graph
 	UPROPERTY()
 	TArray<TObjectPtr<ABuildingNode>> Nodes;
+
+	
+	TMultiMap<TObjectPtr<ABuildingNode>,TArray<FBuildingGraphArc>> Arcs;
 	
 	UPROPERTY()
 	int32 TotalMaintenanceCost[(uint8)(EResource::MAX)];
 
-	
+	UPROPERTY()
+	TObjectPtr<ADMToolCupboard> ToolCupboard;
+		
 	
 };

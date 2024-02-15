@@ -66,16 +66,17 @@ public:
 	FORCEINLINE EBuildingGrade GetBuildingGradeType() const { return BuildingGradeType; }
 	
 #pragma endregion
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	
 
+	
 protected:
 	
 	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaSeconds) override;
-
-	
-
 
 	
 

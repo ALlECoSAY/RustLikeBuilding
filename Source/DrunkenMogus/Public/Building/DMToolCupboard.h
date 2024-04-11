@@ -7,7 +7,7 @@
 #include "WorldObjects/SMStaticWorldObject.h"
 #include "DMToolCupboard.generated.h"
 
-class UBuildingGraph;
+class ABuildingGraph;
 class AFoundationBuildingNode;
 
 UCLASS()
@@ -31,14 +31,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	
 
-	void Decay();
 
 protected:
 
 	UPROPERTY()
-	TObjectPtr<UBuildingGraph> BuildingGraph;
+	TObjectPtr<ABuildingGraph> BuildingGraph;
 
 	UPROPERTY()
 	int32 MaintenanceCost[(uint8)(EResource::MAX)];

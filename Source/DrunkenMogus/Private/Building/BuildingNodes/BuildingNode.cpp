@@ -53,13 +53,13 @@ void ABuildingNode::Tick(float DeltaSeconds)
 void ABuildingNode::Debug_Draw(float Time) const
 {
 	
-	const auto GameInst = CastChecked<UDMGameInstance>(GetGameInstance());
+	/*const auto GameInst = CastChecked<UDMGameInstance>(GetGameInstance());
 
 	//get anchor sockets by tag
 	const TArray<UStaticMeshSocket*> CenterSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Center).ToString());
 	const TArray<UStaticMeshSocket*> SideSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Side).ToString());
 	const TArray<UStaticMeshSocket*> CornerSockets = GetStaticMeshComponent()->GetStaticMesh()->GetSocketsByTag(GameInst->GetSocketNameByType(EBuildingSocketType::Corner).ToString());
-
+	
 	TArray<UStaticMeshSocket*> AllAnchorSockets[(uint8)EBuildingSocketType::MAX] = {CenterSockets, SideSockets, CornerSockets};
 
 	if (bDebugDrawAnchorSockets)
@@ -78,13 +78,14 @@ void ABuildingNode::Debug_Draw(float Time) const
 	{
 		Debug_DrawSnapSockets(AllSnapSockets);
 	}
+	*/
 
 	
 }
 
 void ABuildingNode::Debug_DrawSnapSockets(TArray<UStaticMeshSocket*>* Sockets) const
 {
-	for ( int i = 0; i < (uint8)EBuildingNode::MAX; ++i)
+	/*for ( int i = 0; i < (uint8)EBuildingNode::MAX; ++i)
 	{
 		for (const auto& Socket : Sockets[i])
 		{
@@ -92,13 +93,13 @@ void ABuildingNode::Debug_DrawSnapSockets(TArray<UStaticMeshSocket*>* Sockets) c
 			DrawDebugSphere(GetWorld(), SocketLocation, 5.0f, 6, FColor::Magenta, false, 0, 1, 2.f);
 			DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, 0, false, 0.75f);
 		}
-	}
+	}*/
 	
 }
 
 void ABuildingNode::Debug_DrawAnchorSockets(TArray<UStaticMeshSocket*>* Sockets) const
 {
-	for (const auto& Socket : Sockets[(uint8)EBuildingSocketType::Center])
+	/*for (const auto& Socket : Sockets[(uint8)EBuildingSocketType::Center])
 	{
 		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
 		DrawDebugSphere(GetWorld(), SocketLocation, 15.0f, 12, FColor::Red, false, 0, 1, 2.f);
@@ -119,7 +120,7 @@ void ABuildingNode::Debug_DrawAnchorSockets(TArray<UStaticMeshSocket*>* Sockets)
 		const FVector SocketLocation = Socket->RelativeLocation + GetActorLocation();
 		DrawDebugSphere(GetWorld(), SocketLocation, 7.0f, 12, FColor::Blue, false, 0, 1, 1.f);
 		DrawDebugString(GetWorld(), SocketLocation, Socket->Tag, nullptr, FColor::Black, 0, false, 0.75f);
-	}
+	}*/
 }
 
 #endif

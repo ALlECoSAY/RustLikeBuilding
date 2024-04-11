@@ -16,14 +16,14 @@ struct FBuildingNodeResourceCost
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResource"))
-	int32 ConstructionCost[(uint8)(EResource::MAX)];
+	UPROPERTY(EditAnywhere)
+	TMap<EResource,uint32> ConstructionCost;
 	
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResource"))
-	int32 MaintenanceCost[(uint8)(EResource::MAX)];
+	UPROPERTY(EditAnywhere)
+	TMap<EResource,uint32> MaintenanceCost;
 
-	UPROPERTY(EditAnywhere, meta = (ArraySizeEnum = "EResource"))
-	int32 RepairCost[(uint8)(EResource::MAX)];
+	UPROPERTY(EditAnywhere)
+	TMap<EResource,uint32> RepairCost;
 	
 };
 

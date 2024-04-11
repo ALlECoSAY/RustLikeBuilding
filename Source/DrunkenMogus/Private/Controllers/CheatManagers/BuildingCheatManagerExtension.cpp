@@ -6,6 +6,8 @@
 #include "Building/BuildingNodes/BuildingNode.h"
 #include "Kismet/GameplayStatics.h"
 
+#if WITH_EDITOR
+
 void UBuildingCheatManagerExtension::DrawDebugBuildingNode(int32 bEnableDebug)
 {
 
@@ -19,3 +21,7 @@ void UBuildingCheatManagerExtension::DrawDebugBuildingNode(int32 bEnableDebug)
 	}
 	
 }
+
+
+#endif
+

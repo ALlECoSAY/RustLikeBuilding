@@ -16,49 +16,24 @@ class ABuildingNode;
  */
 
 
-USTRUCT()
-struct FBuildingGraphArc
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	ABuildingNode* EndNode;
-
-	UPROPERTY()
-	EBuildingNode ArcType;
-};
-
 
 
 
 UCLASS()
-class DRUNKENMOGUS_API UBuildingGraph : public UObject
+class DRUNKENMOGUS_API ABuildingGraph : public AActor
 {
 	GENERATED_BODY()
 
 public:
 
-	// return TotalMaintenanceCost array
-	FORCEINLINE const int32* GetTotalMaintenanceCost() const { return TotalMaintenanceCost; }
-
-	const int32* UpdateFromCurrentTotalMaintenanceCost();
-
-	const int32* UpdateTotalMaintenanceCost(ABuildingNode* Node, bool bAdd);
 	
 public:
 
-	// All nodes in the graph
 	UPROPERTY()
 	TArray<TObjectPtr<ABuildingNode>> Nodes;
-
 	
-	TMultiMap<TObjectPtr<ABuildingNode>,TArray<FBuildingGraphArc>> Arcs;
-	
-	UPROPERTY()
-	int32 TotalMaintenanceCost[(uint8)(EResource::MAX)];
-
 	UPROPERTY()
 	TObjectPtr<ADMToolCupboard> ToolCupboard;
-		
+
 	
 };

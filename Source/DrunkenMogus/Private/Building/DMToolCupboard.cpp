@@ -22,22 +22,8 @@ void ADMToolCupboard::BeginPlay()
 
 	//Spawn deffered to set core node
 
-	
-	
 }
 
-void ADMToolCupboard::Decay()
-{
-//todo implement decay
-	/*auto Nodes = BuildingGraph->Nodes;
-
-	for(auto Node : Nodes)
-	{
-		Node->Decay();
-		
-	}*/
-	
-}
 
 // Called every frame
 void ADMToolCupboard::Tick(float DeltaTime)

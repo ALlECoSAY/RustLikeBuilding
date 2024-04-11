@@ -51,6 +51,8 @@ protected:
 	void ToggleBuildingMenu();
 	void ShowBuildingMenu();
 	void HideBuildingMenu();
+	// Building input handling
+	void Build();
 	// Input mappings management
 	void AddBuildingInputMappingContext();
 	void RemoveBuildingInputMappingContext();
@@ -73,13 +75,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* BuildingMappingContext;
 
-	/** Jump Input Action */
+	/** ToggleBuildingMode Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleBuildingModeAction;
 
-	/** Move Input Action */
+	/** ToggleBuildingMenu Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleBuildingMenuAction;
+
+	/** Build Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* BuildAction;
 	
 	UPROPERTY(EditAnywhere, Category= Input,  meta = (AllowPrivateAccess = "true"))
 	int InputMappingContextPriority = 0;
@@ -95,15 +101,18 @@ protected:
 	TObjectPtr<AActor> BlueprintBuildingNodeActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|UI", meta = (AllowPrivateAccess = "true"))
-	TArray<TSubclassOf<AActor>> BlueprintBuildingNodeActorClasses;
+	EBuildingNode CurrentBuildingNode = EBuildingNode::SquareFoundation;
 
-	TSharedPtr<TArray<FBuildingNodeInfo>> BuildingNodesInfos;
-
+	UPROPERTY(Transient)
+	TArray<FBuildingNodeInfo> BuildingNodesInfos;
+	
 	FBuildingNodeInfo* CurrentBuildingNodeInfo = nullptr;
 
 	FVector FocusLocation;
+	FRotator FocusRotation;
 	
 	FVector SnappedLocation;
+	FRotator SnappedRotation;
 	
 	bool bIsBuildingModeActive = false;
 	bool bIsBuildingMenuShown = false;

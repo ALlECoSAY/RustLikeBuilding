@@ -7,7 +7,7 @@
 #include "OpenWorldDMGameMode.generated.h"
 
 
-class UBuildingGraph;
+class ABuildingGraph;
 /**
  * 
  */
@@ -26,7 +26,7 @@ protected:
 
 
 	UPROPERTY()
-	TArray<TObjectPtr<UBuildingGraph>> BuildingGraphs;
+	TArray<TObjectPtr<ABuildingGraph>> BuildingGraphs;
 
 	
 };

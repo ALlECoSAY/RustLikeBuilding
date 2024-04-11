@@ -14,10 +14,12 @@ class DRUNKENMOGUS_API UBuildingCheatManagerExtension : public UCheatManagerExte
 {
 	GENERATED_BODY()
 
-
+#if WITH_EDITOR
+    
 	UFUNCTION(Exec)
 	void DrawDebugBuildingNode(int32 bEnableDebug);
 	
+#endif
 
 	
 };

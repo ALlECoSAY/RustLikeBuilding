@@ -1,21 +1,19 @@
 // Oleksii Pushkarov practice Rust-alike Building System + UI
 
 
-#include "GameInstances/DMGameInstance.h"
+#include "BuildingDeveloperSettings.h"
 
 #include "Building/BuildingNodes/BuildingNode.h"
 
-/*
-void UDMGameInstance::Init()
+void UBuildingDeveloperSettings::PostInitProperties()
 {
-	Super::Init();
+	Super::PostInitProperties();
 
-	//if server
 
+	//todo (mb excessive) preload load BuildingNodeInfo datatable
 
 	
-	//todo load BuildingNodeInfo datatable
-	//BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
+	/*//BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
 	check(BuildingDataTable);
 	
 	FString Context = TEXT(__FUNCTION__);
@@ -34,6 +32,7 @@ void UDMGameInstance::Init()
 		BuildingNodesInfos[BuildingTypeIterateCheck]=Row;
 		++BuildingTypeIterateCheck;
 	}
-	
+	*/
+
+	BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
 }
-*/

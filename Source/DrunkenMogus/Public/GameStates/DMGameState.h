@@ -7,7 +7,7 @@
 #include "DMGameState.generated.h"
 
 
-class UBuildingGraph;
+class ABuildingGraph;
 /**
  * 
  */
@@ -21,7 +21,7 @@ class DRUNKENMOGUS_API ADMGameState : public AGameState
 private:
 
 	UPROPERTY()
-	TArray<TObjectPtr<UBuildingGraph>> BuildingGraphs;
+	TArray<TObjectPtr<ABuildingGraph>> BuildingGraphs;
 
 	
 };

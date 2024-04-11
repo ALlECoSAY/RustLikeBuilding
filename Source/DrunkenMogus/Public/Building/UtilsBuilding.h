@@ -17,6 +17,7 @@ enum class EBuildingSocketType : uint8
 
 
 
+
 UENUM(BlueprintType, Category = "Building|Grade", meta = (DisplayName = "Resource Type"))
 enum class EBuildingGrade : uint8
 {
@@ -29,11 +30,38 @@ enum class EBuildingGrade : uint8
 UENUM(BlueprintType, Category = "Building", meta = (DisplayName = "BuildingNode Type"))
 enum class EBuildingNode : uint8
 {
- Wall UMETA(DisplayName = "Wall"),
  SquareFoundation UMETA(DisplayName = "Square Foundation"),
  TriangleFoundation UMETA(DisplayName = "Triangle Foundation"),
  MAX UMETA(Hidden = "true")
 };
+
+//todo exclude from project
+UENUM(BlueprintType, Category = "Building|Sockets", meta = (Bitflags, DisplayName = "SquareFoundation Sockets"))
+enum ESquareFoundationSocket
+{
+ SquareFoundation0 UMETA(DisplayName = "Square Foundation 0"),
+ SquareFoundation1 UMETA(DisplayName = "Square Foundation 1"),
+ SquareFoundation2 UMETA(DisplayName = "Square Foundation 2"),
+ SquareFoundation3 UMETA(DisplayName = "Square Foundation 3"),
+ TriangleFoundation0 UMETA(DisplayName = "Triangle Foundation 0"),
+ TriangleFoundation1 UMETA(DisplayName = "Triangle Foundation 1"),
+ TriangleFoundation2 UMETA(DisplayName = "Triangle Foundation 2"),
+ TriangleFoundation3 UMETA(DisplayName = "Triangle Foundation 3"),
+ MAX UMETA(Hidden = "true")
+};
+ENUM_CLASS_FLAGS(ESquareFoundationSocket);
+
+/*UENUM(BlueprintType, Category = "Building|Sockets", meta = (DisplayName = "TriangleFoundation Sockets"))
+enum class ETriangleFoundationSocket : uint8
+{
+ SquareFoundation0 UMETA(DisplayName = "Square Foundation 0"),
+ SquareFoundation1 UMETA(DisplayName = "Square Foundation 1"),
+ SquareFoundation2 UMETA(DisplayName = "Square Foundation 2"),
+ TriangleFoundation0 UMETA(DisplayName = "Triangle Foundation 0"),
+ TriangleFoundation1 UMETA(DisplayName = "Triangle Foundation 1"),
+ TriangleFoundation2 UMETA(DisplayName = "Triangle Foundation 2"),
+ MAX UMETA(Hidden = "true")
+};*/
 
 
 UENUM(BlueprintType, Category = "Resource", meta = (DisplayName = "Resource Type"))
@@ -55,7 +83,6 @@ public:
  {
   switch (Enum)
   { 
-  case EBuildingNode::Wall: return "Wall";
   case EBuildingNode::SquareFoundation: return "SquareFoundation";
   case EBuildingNode::TriangleFoundation: return "TriangleFoundation";
   case EBuildingNode::MAX: return "MAX";

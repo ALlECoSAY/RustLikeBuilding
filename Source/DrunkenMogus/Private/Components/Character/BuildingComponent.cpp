@@ -3,11 +3,13 @@
 
 #include "Components/Character/BuildingComponent.h"
 
+#include "BuildingDeveloperSettings.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/DMCharacter.h"
 #include "Controllers/DMPlayerController.h"
+#include "Engine/StaticMeshActor.h"
 #include "GameInstances/DMGameInstance.h"
 
 
@@ -56,9 +58,10 @@ void UBuildingComponent::BeginPlay()
 
 void UBuildingComponent::SetupDefaults()
 {
-	//CurrentBuildingNodeInfo = 
-	
-	
+	//CurrentBuildingNodeInfo = GetWorld()->GetGameInstance<UDMGameInstance>()->GetBuildingNodeInfo(CurrentBuildingNode);
+	/*const auto BuildingDevSettings = GetDefault<UBuildingDeveloperSettings>();
+	const auto BuildingDataTable = BuildingDevSettings->BuildingDataTable.LoadSynchronous();
+	CurrentBuildingNodeInfo = BuildingDataTable->FindRow<FBuildingNodeInfo>(FName("BuildingNodeInfo"), FString("1"));*/
 }
 
 
@@ -67,6 +70,11 @@ void UBuildingComponent::UpdateBuildingView(FVector CameraLocation, FVector Came
 	UpdateFocusLocation(CameraLocation, CameraForwardVector);
 	UpdateSnappedLocation(CameraLocation, CameraForwardVector);
 
+	check(BlueprintBuildingNodeActor)
+
+	BlueprintBuildingNodeActor->SetActorLocation(SnappedLocation);
+	BlueprintBuildingNodeActor->SetActorRotation(SnappedRotation);
+	
 	
 #if WITH_EDITOR
 	Debug_DrawDebug();
@@ -76,17 +84,25 @@ void UBuildingComponent::UpdateBuildingView(FVector CameraLocation, FVector Came
 void UBuildingComponent::UpdateFocusLocation(FVector CameraLocation, FVector CameraForwardVector)
 {
 	FocusLocation = CameraLocation + CameraForwardVector * BuildDistance;
+	FocusRotation = CameraForwardVector.Rotation();
+	FocusRotation.Pitch = 0.0f; FocusRotation.Roll = 0.0f;
 }
 
 void UBuildingComponent::UpdateSnappedLocation(FVector CameraLocation, FVector CameraForwardVector)
 {
 	//todo: implement snapping to the grid
-	SnappedLocation = FocusLocation - FVector::UpVector * 200.0f;
+	SnappedLocation = FocusLocation;
+	SnappedRotation = FocusRotation;
 }
 
 void UBuildingComponent::OnCharacterFollowCameraTransformUpdate(USceneComponent* UpdatedComponent,
 	EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
 {
+	if (!bIsBuildingModeActive)
+	{
+		return;
+	}
+	
 	const auto Character = CastChecked<ADMCharacter>(GetOwner());
 	const auto CameraComponent = Character->GetFollowCamera();
 	const auto CameraLocation = CameraComponent->GetComponentLocation();
@@ -95,7 +111,6 @@ void UBuildingComponent::OnCharacterFollowCameraTransformUpdate(USceneComponent*
 
 	check(PlayerController);
 
-	//const auto ForwardVector = PlayerController->GetControlRotation().Vector();
 	const auto CameraForwardVector = CameraComponent->GetForwardVector();
 
 	UpdateBuildingView(CameraLocation, CameraForwardVector);
@@ -103,8 +118,8 @@ void UBuildingComponent::OnCharacterFollowCameraTransformUpdate(USceneComponent*
 
 void UBuildingComponent::ToggleBuildingMode()
 {
-	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 #if WITH_EDITOR
+	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
 #endif
@@ -141,6 +156,15 @@ void UBuildingComponent::HideBuildingMenu()
 #endif
 	
 	OnToggleBuildingMenuDelegate.Broadcast(false);
+}
+
+void UBuildingComponent::Build()
+{
+	const auto BuildingNodeClass = CurrentBuildingNodeInfo->BuildingNodeClass;
+	check(BuildingNodeClass);
+	auto Params = FActorSpawnParameters();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	GetWorld()->SpawnActor<AActor>(BuildingNodeClass, SnappedLocation, SnappedRotation, Params);
 }
 
 void UBuildingComponent::AddBuildingInputMappingContext()
@@ -185,7 +209,9 @@ void UBuildingComponent::BindInputActionsToCallbackFunctions()
 
 	// Building Menu Open
 	EnhancedInputComponent->BindAction(ToggleBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMenu);
-		
+
+	// Build
+	EnhancedInputComponent->BindAction(BuildAction, ETriggerEvent::Triggered, this, &ThisClass::Build);		
 }
 
 #if WITH_EDITOR
@@ -203,19 +229,25 @@ void UBuildingComponent::Debug_DrawDebug()
 void UBuildingComponent::ActivateBuildingMode()
 {
 	SetComponentTickEnabled(true);
+	
+	auto Params = FActorSpawnParameters();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	BlueprintBuildingNodeActor = GetWorld()->SpawnActor<AActor>(CurrentBuildingNodeInfo->BlueprintBuildingNodeClass, SnappedLocation, SnappedRotation, Params);
+	
 	OnToggleBuildingModeDelegate.Broadcast(true);
 }
 
 void UBuildingComponent::DeactivateBuildingModeOff()
 {
 	SetComponentTickEnabled(false);
+	BlueprintBuildingNodeActor->Destroy();
 	OnToggleBuildingModeDelegate.Broadcast(false);
 }
 
 void UBuildingComponent::ToggleBuildingMenu()
 {
-	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 #if WITH_EDITOR
+	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
 #endif

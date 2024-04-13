@@ -34,13 +34,13 @@ struct FBuildingNodeInfo : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	EBuildingNode BuildingNodeType;
+	EBuildingNode BuildingNodeType = EBuildingNode::MAX;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ABuildingNode> BuildingNodeClass;
+	TSubclassOf<ABuildingNode> BuildingNodeClass = nullptr;
 	
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AStaticMeshActor> BlueprintBuildingNodeClass;
+	TSubclassOf<AStaticMeshActor> BlueprintBuildingNodeClass = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float MaxSnappingRadius = 0.0f;

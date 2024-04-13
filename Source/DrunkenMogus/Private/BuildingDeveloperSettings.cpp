@@ -34,5 +34,15 @@ void UBuildingDeveloperSettings::PostInitProperties()
 	}
 	*/
 
-	BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
+	//BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
+
+
+	
+}
+
+FBuildingNodeInfo* UBuildingDeveloperSettings::GetBuildingNodeInfo(EBuildingNode Type) const
+{
+	FName BuildingNodeName = BuildingNodeToFName.FindRef(Type);  
+	const auto Context = TEXT(__FUNCTION__);
+	return BuildingDataTable->FindRow<FBuildingNodeInfo>(BuildingNodeName, Context);
 }

@@ -17,22 +17,24 @@ class DRUNKENMOGUS_API UBuildingDeveloperSettings : public UDeveloperSettings
 	GENERATED_BODY()
 
 	virtual void PostInitProperties() override;
-
-
 	
-	
-
 public:
+	
+	FBuildingNodeInfo* GetBuildingNodeInfo(EBuildingNode Type) const;
 
 	FORCEINLINE FName GetSocketNameByType(EBuildingSocketType Type) const { return SocketTypeToFName[Type]; }
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Building, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = Building)
 	TSoftObjectPtr<UDataTable> BuildingDataTable;
-	
-protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Building|Meshes|Sockets", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = Building)
+	EBuildingNode DefaultBuildingNode;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = Building)
 	TMap<EBuildingSocketType,FName> SocketTypeToFName;
 
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = Building)
+	TMap<EBuildingNode,FName> BuildingNodeToFName;
+	
 	
 };

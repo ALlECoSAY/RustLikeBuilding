@@ -20,48 +20,6 @@ class DRUNKENMOGUS_API UBuildingComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-
-	
-
-public:
-	// Sets default values for this component's properties
-	UBuildingComponent();
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-							   FActorComponentTickFunction* ThisTickFunction) override;
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	void SetupDefaults();
-
-	void UpdateBuildingView(FVector CameraLocation, FVector CameraForwardVector);
-	void UpdateFocusLocation(FVector CameraLocation, FVector CameraForwardVector);
-	void UpdateSnappedLocation(FVector CameraLocation, FVector CameraForwardVector);
-
-	// Callback on TransformUpdate
-	void OnCharacterFollowCameraTransformUpdate(USceneComponent* UpdatedComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport);
-
-	// Building Mode input handling 
-	void ToggleBuildingMode();
-	void ActivateBuildingMode();
-	void DeactivateBuildingModeOff();
-	// Building Menu input handling
-	void ToggleBuildingMenu();
-	void ShowBuildingMenu();
-	void HideBuildingMenu();
-	// Building input handling
-	void Build();
-	// Input mappings management
-	void AddBuildingInputMappingContext();
-	void RemoveBuildingInputMappingContext();
-	void BindInputActionsToCallbackFunctions();
-
-
-
-
-
 public:
 	
 	FOnToggleBuildingModeSignature OnToggleBuildingModeDelegate;
@@ -69,21 +27,58 @@ public:
 
 protected:
 
+	UBuildingComponent();
+	virtual void BeginPlay() override;
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	
+
+	void SetupDefaults();
+	
+	// Callback on TransformUpdate
+	void OnCharacterFollowCameraTransformUpdate(USceneComponent* UpdatedComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport);
+
+
+#pragma region UI
+protected:
+	
+	void ShowBuildingMenu() const;
+	void HideBuildingMenu() const;
+	
+	bool bIsBuildingModeActive = false;
+	bool bIsBuildingMenuShown = false;
+	
+#pragma endregion
+	
 #pragma region Input
+protected:
+	
+	// Input mappings management
+	void AddBuildingInputMappingContext() const;
+	void RemoveBuildingInputMappingContext() const;
+	void BindInputActionsToCallbackFunctions();
+	
+	// Building Mode input handling 
+	void OnToggleBuildingModeInput();
+	
+	// Building Menu input handling
+	void OnToggleBuildingMenuInput();
+
+	// Building input handling
+	void OnBuildInput();
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* BuildingMappingContext;
 
-	/** ToggleBuildingMode Input Action */
+	/** OnToggleBuildingModeInput Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleBuildingModeAction;
 
-	/** ToggleBuildingMenu Input Action */
+	/** OnToggleBuildingMenuInput Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleBuildingMenuAction;
 
-	/** Build Input Action */
+	/** OnBuildInput Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* BuildAction;
 	
@@ -93,7 +88,24 @@ protected:
 #pragma endregion
 
 #pragma region Building
+protected:
+	void ActivateBuildingMode();
+	void DeactivateBuildingModeOff();
 	
+	void UpdateBuildingView(FVector CameraLocation, FVector CameraForwardVector);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_TryPlaceBlueprint(FVector Location, FRotator Rotation);
+	UFUNCTION(Client, Unreliable)
+	void Client_PlaceBlueprint(FVector Location, FRotator Rotation, bool IsPlaceable, bool IsSnapped);
+
+	UFUNCTION(Server, Reliable)
+	void Server_TryBuild(FVector Location, FRotator Rotation, EBuildingNode BuildingNode);
+
+	#if UE_SERVER
+	void Build(FVector Location, FRotator Rotation, EBuildingNode BuildingNode);
+	#endif
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Building, meta = (AllowPrivateAccess = "true"))
 	float BuildDistance = 1000.f;
 
@@ -102,21 +114,19 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|UI", meta = (AllowPrivateAccess = "true"))
 	EBuildingNode CurrentBuildingNode = EBuildingNode::SquareFoundation;
-
-	UPROPERTY(Transient)
-	TArray<FBuildingNodeInfo> BuildingNodesInfos;
-	
-	FBuildingNodeInfo* CurrentBuildingNodeInfo = nullptr;
-
-	FVector FocusLocation;
-	FRotator FocusRotation;
 	
 	FVector SnappedLocation;
 	FRotator SnappedRotation;
 	
-	bool bIsBuildingModeActive = false;
-	bool bIsBuildingMenuShown = false;
+	bool bIsSnapped = false;
+	bool bIsPlaceable = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building|Blueprint", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMaterialInstanceDynamic> BlueprintMaterial;
 
+
+#pragma endregion
+	
 #pragma region Debug
 
 	

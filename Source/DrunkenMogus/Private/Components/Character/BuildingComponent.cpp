@@ -13,87 +13,124 @@
 #include "GameInstances/DMGameInstance.h"
 
 
-// Sets default values for this component's properties
 UBuildingComponent::UBuildingComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-	UActorComponent::SetComponentTickEnabled(false);
-
-	// ...
-	
-
+#if UE_SERVER
+    PrimaryComponentTick.bCanEverTick = true;
+#endif
 }
 
 
-// Called when the game starts
 void UBuildingComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+    UActorComponent::SetComponentTickEnabled(false);
 
-	// ...
-
+#if not UE_SERVER 
 
 	//get GameInstance
 	const auto GameInstance = CastChecked<UDMGameInstance>(GetWorld()->GetGameInstance());
 
-	//todo get the building data table 
-	//BuildingNodesInfos = GameInstance->GetBuildingNodesInfos();
-	
 	const auto Character = CastChecked<ADMCharacter>(GetOwner());
 	//bind view update to the camera transform update
 	Character->GetFollowCamera()->TransformUpdated.AddUObject(this, &ThisClass::OnCharacterFollowCameraTransformUpdate);
 
 	AddBuildingInputMappingContext();
 	
-	//todo error nptr exception, mb delegate firing
 	BindInputActionsToCallbackFunctions();
-
 
 	//setup deafault values for building
 	SetupDefaults();
 	
+#endif
+	
+}
+
+void UBuildingComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
+#if not UE_SERVER
+	RemoveBuildingInputMappingContext();
+#endif
 }
 
 void UBuildingComponent::SetupDefaults()
 {
-	//CurrentBuildingNodeInfo = GetWorld()->GetGameInstance<UDMGameInstance>()->GetBuildingNodeInfo(CurrentBuildingNode);
-	/*const auto BuildingDevSettings = GetDefault<UBuildingDeveloperSettings>();
-	const auto BuildingDataTable = BuildingDevSettings->BuildingDataTable.LoadSynchronous();
-	CurrentBuildingNodeInfo = BuildingDataTable->FindRow<FBuildingNodeInfo>(FName("BuildingNodeInfo"), FString("1"));*/
+	const auto BuildingDeveloperSettings = GetDefault<UBuildingDeveloperSettings>();
+
+	CurrentBuildingNode = BuildingDeveloperSettings->DefaultBuildingNode;
 }
 
 
 void UBuildingComponent::UpdateBuildingView(FVector CameraLocation, FVector CameraForwardVector)
 {
-	UpdateFocusLocation(CameraLocation, CameraForwardVector);
-	UpdateSnappedLocation(CameraLocation, CameraForwardVector);
 
-	check(BlueprintBuildingNodeActor)
-
-	BlueprintBuildingNodeActor->SetActorLocation(SnappedLocation);
-	BlueprintBuildingNodeActor->SetActorRotation(SnappedRotation);
-	
-	
+	const auto CameraFocusLocation = CameraLocation + CameraForwardVector * BuildDistance;
+	auto CameraFocusRotation = CameraForwardVector.Rotation();
+	CameraFocusRotation.Pitch = 0.0f; CameraFocusRotation.Roll = 0.0f;
+	Server_TryPlaceBlueprint(CameraFocusLocation, CameraFocusRotation);
+		
 #if WITH_EDITOR
 	Debug_DrawDebug();
 #endif
 }
 
-void UBuildingComponent::UpdateFocusLocation(FVector CameraLocation, FVector CameraForwardVector)
+void UBuildingComponent::Server_TryBuild_Implementation(FVector Location, FRotator Rotation, EBuildingNode BuildingNode)
 {
-	FocusLocation = CameraLocation + CameraForwardVector * BuildDistance;
-	FocusRotation = CameraForwardVector.Rotation();
-	FocusRotation.Pitch = 0.0f; FocusRotation.Roll = 0.0f;
+#if UE_SERVER
+
+	Build(Location, Rotation, BuildingNode);	
+
+#endif
 }
 
-void UBuildingComponent::UpdateSnappedLocation(FVector CameraLocation, FVector CameraForwardVector)
+#if UE_SERVER
+void UBuildingComponent::Build(FVector Location, FRotator Rotation, EBuildingNode BuildingNode)
 {
-	//todo: implement snapping to the grid
-	SnappedLocation = FocusLocation;
-	SnappedRotation = FocusRotation;
+	const auto BuildingNodeInfo = GetDefault<UBuildingDeveloperSettings>()->GetBuildingNodeInfo(BuildingNode);
+	check(BuildingNodeInfo);
+	const auto BuildingNodeClass = BuildingNodeInfo->BuildingNodeClass;
+	check(BuildingNodeClass);
+	auto Params = FActorSpawnParameters();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	GetWorld()->SpawnActor<AActor>(BuildingNodeClass, Location, Rotation, Params);	
 }
+#endif
+
+void UBuildingComponent::Server_TryPlaceBlueprint_Implementation(FVector Location, FRotator Rotation)
+{
+#if UE_SERVER
+    bool IsSuccess = true;
+	bool IsSnapped = false;
+	FVector NewLocation = Location;
+	FRotator NewRotation = Rotation;
+
+	Client_PlaceBlueprint(NewLocation, NewRotation, IsSuccess, IsSnapped);
+#endif
+}
+
+
+void UBuildingComponent::Client_PlaceBlueprint_Implementation(FVector Location, FRotator Rotation, bool IsPlaceable,
+	bool IsSnapped)
+{
+#if not UE_SERVER
+
+	SnappedLocation = Location;
+	SnappedRotation = Rotation;
+	bIsSnapped = IsSnapped;
+	if(bIsPlaceable != IsPlaceable)
+	{
+		bIsPlaceable = IsPlaceable;
+		//todo blueprint material options
+	}
+	
+	BlueprintBuildingNodeActor->SetActorLocationAndRotation(SnappedLocation, SnappedRotation);
+	
+#endif
+}
+
+
 
 void UBuildingComponent::OnCharacterFollowCameraTransformUpdate(USceneComponent* UpdatedComponent,
 	EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
@@ -116,7 +153,7 @@ void UBuildingComponent::OnCharacterFollowCameraTransformUpdate(USceneComponent*
 	UpdateBuildingView(CameraLocation, CameraForwardVector);
 }
 
-void UBuildingComponent::ToggleBuildingMode()
+void UBuildingComponent::OnToggleBuildingModeInput()
 {
 #if WITH_EDITOR
 	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
@@ -136,7 +173,7 @@ void UBuildingComponent::ToggleBuildingMode()
 	}
 }
 
-void UBuildingComponent::ShowBuildingMenu()
+void UBuildingComponent::ShowBuildingMenu() const
 {
 
 #if WITH_EDITOR
@@ -148,7 +185,7 @@ void UBuildingComponent::ShowBuildingMenu()
 	
 }
 
-void UBuildingComponent::HideBuildingMenu()
+void UBuildingComponent::HideBuildingMenu() const
 {
 #if WITH_EDITOR
 	if(GEngine)
@@ -158,67 +195,51 @@ void UBuildingComponent::HideBuildingMenu()
 	OnToggleBuildingMenuDelegate.Broadcast(false);
 }
 
-void UBuildingComponent::Build()
+void UBuildingComponent::OnBuildInput()
 {
-	const auto BuildingNodeClass = CurrentBuildingNodeInfo->BuildingNodeClass;
-	check(BuildingNodeClass);
-	auto Params = FActorSpawnParameters();
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GetWorld()->SpawnActor<AActor>(BuildingNodeClass, SnappedLocation, SnappedRotation, Params);
+#if WITH_EDITOR
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%hs"), __FUNCTION__));
+#endif
+
+	Server_TryBuild(SnappedLocation, SnappedRotation, CurrentBuildingNode);
 }
 
-void UBuildingComponent::AddBuildingInputMappingContext()
+void UBuildingComponent::AddBuildingInputMappingContext() const
 {
-	//get the player controller
 	const auto PlayerController = CastChecked<ADMPlayerController>(GetOwner()->GetInstigatorController());
-	//get the subsystem
 	const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-
-	//add Input Mapping Context
-	if (Subsystem)
-	{
-		Subsystem->AddMappingContext(BuildingMappingContext, InputMappingContextPriority);
-	}
+	check(Subsystem);
+	Subsystem->AddMappingContext(BuildingMappingContext, InputMappingContextPriority);
 }
 
-void UBuildingComponent::RemoveBuildingInputMappingContext()
+void UBuildingComponent::RemoveBuildingInputMappingContext() const
 {
-	//get the player controller
-	const auto PlayerController = CastChecked<ADMPlayerController>(GetOwner()->GetInstigatorController());
-	//get the subsystem
-	const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-
-	//add Input Mapping Context
-	if (Subsystem)
+	if(!IsValid(GetOwner()))
 	{
-		Subsystem->AddMappingContext(BuildingMappingContext, InputMappingContextPriority);
+		return;
 	}
+	const auto PlayerController = CastChecked<ADMPlayerController>(GetOwner()->GetInstigatorController());
+	const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	check(Subsystem);
+	Subsystem->RemoveMappingContext(BuildingMappingContext);
 }
 
 void UBuildingComponent::BindInputActionsToCallbackFunctions()
 {
-	//get the player controller
 	const auto PlayerController = CastChecked<ADMPlayerController>(GetOwner()->GetInstigatorController());
-	//get the input component
 	const auto EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerController->InputComponent);
 	
-	//bind the toggle building menu delegate
-	
-	// Toggle Building Mode
-	EnhancedInputComponent->BindAction(ToggleBuildingModeAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMode);
-
-	// Building Menu Open
-	EnhancedInputComponent->BindAction(ToggleBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::ToggleBuildingMenu);
-
-	// Build
-	EnhancedInputComponent->BindAction(BuildAction, ETriggerEvent::Triggered, this, &ThisClass::Build);		
+	EnhancedInputComponent->BindAction(ToggleBuildingModeAction, ETriggerEvent::Triggered, this, &ThisClass::OnToggleBuildingModeInput);
+	EnhancedInputComponent->BindAction(ToggleBuildingMenuAction, ETriggerEvent::Triggered, this, &ThisClass::OnToggleBuildingMenuInput);
+	EnhancedInputComponent->BindAction(BuildAction, ETriggerEvent::Triggered, this, &ThisClass::OnBuildInput);
 }
 
 #if WITH_EDITOR
 void UBuildingComponent::Debug_DrawDebug()
 {
-	//draw debug FocusLocation
-	DrawDebugSphere(GetWorld(), FocusLocation, 15.0f, 12, FColor::Magenta, false, 0, 10, 3.f);
+	//draw debug CameraFocusLocation
+	//DrawDebugSphere(GetWorld(), CameraFocusLocation, 15.0f, 12, FColor::Magenta, false, 0, 10, 3.f);
 
 	//draw debug SnappedLocation
 	DrawDebugSphere(GetWorld(), SnappedLocation, 25.0f, 12, FColor::Green, false, 0, 10, 3.f);
@@ -228,30 +249,44 @@ void UBuildingComponent::Debug_DrawDebug()
 
 void UBuildingComponent::ActivateBuildingMode()
 {
+	//enable tick
 	SetComponentTickEnabled(true);
-	
+
+	//spawn default blueprint node actor
 	auto Params = FActorSpawnParameters();
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	const auto BuildingDeveloperSettings = GetDefault<UBuildingDeveloperSettings>();
+	CurrentBuildingNode = BuildingDeveloperSettings->DefaultBuildingNode;
+	const auto CurrentBuildingNodeInfo = BuildingDeveloperSettings->GetBuildingNodeInfo(CurrentBuildingNode);
+	check(CurrentBuildingNodeInfo);
 	BlueprintBuildingNodeActor = GetWorld()->SpawnActor<AActor>(CurrentBuildingNodeInfo->BlueprintBuildingNodeClass, SnappedLocation, SnappedRotation, Params);
-	
+	//notify
 	OnToggleBuildingModeDelegate.Broadcast(true);
 }
 
 void UBuildingComponent::DeactivateBuildingModeOff()
 {
+	//disable tick
 	SetComponentTickEnabled(false);
+	
 	BlueprintBuildingNodeActor->Destroy();
+	//notify
 	OnToggleBuildingModeDelegate.Broadcast(false);
 }
 
-void UBuildingComponent::ToggleBuildingMenu()
+void UBuildingComponent::OnToggleBuildingMenuInput()
 {
+	if(!bIsBuildingModeActive)
+	{
+		return;
+	}
+	
 #if WITH_EDITOR
 	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT(__FUNCTION__));
 #endif
-	
+
 	bIsBuildingMenuShown = !bIsBuildingMenuShown;
 	if(bIsBuildingMenuShown)
 	{
@@ -262,15 +297,5 @@ void UBuildingComponent::ToggleBuildingMenu()
 	{
 		HideBuildingMenu();
 	}
-}
-
-
-// Called every frame
-void UBuildingComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                       FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 

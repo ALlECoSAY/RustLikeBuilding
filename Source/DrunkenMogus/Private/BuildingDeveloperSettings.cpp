@@ -11,7 +11,7 @@ void UBuildingDeveloperSettings::PostInitProperties()
 
 
 	//todo (mb excessive) preload load BuildingNodeInfo datatable
-
+	
 	
 	/*//BuildingDataTable = LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/DrunkenMogus/DataTables/DT_BuildingNodeInfo.DT_BuildingNodeInfo'"));
 	check(BuildingDataTable);
@@ -44,5 +44,8 @@ FBuildingNodeInfo* UBuildingDeveloperSettings::GetBuildingNodeInfo(EBuildingNode
 {
 	FName BuildingNodeName = BuildingNodeToFName.FindRef(Type);  
 	const auto Context = TEXT(__FUNCTION__);
-	return BuildingDataTable->FindRow<FBuildingNodeInfo>(BuildingNodeName, Context);
+	const auto Row = BuildingDataTable.LoadSynchronous()->FindRow<FBuildingNodeInfo>(BuildingNodeName, Context, true);
+	check(Row);
+	UE_LOG(LogTemp, Warning, TEXT("Row: %s"), *Row->BuildingNodeClass->GetName())
+	return Row;
 }
